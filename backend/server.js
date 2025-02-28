@@ -5,6 +5,8 @@ import 'dotenv/config';
 import connectDB from "./config/db.js";
 import connectCloudinary from "./config/cloudinary.js";
 
+import adminRoutes from "./routes/admin.routes.js";
+
 
 // setup
 const app = express();
@@ -17,6 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 // api endpoints
+app.use("/api/v1/admin", adminRoutes);
+
+
+
 app.get("/", (req, res) => {
   res.send("Api working");
 });

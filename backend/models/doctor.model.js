@@ -33,7 +33,7 @@ const doctorSchema = new mongoose.Schema(
     },
     available: {
       type: Boolean,
-      required: true,
+      default: true
     },
     degree: {
       type: String,
@@ -44,8 +44,9 @@ const doctorSchema = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: String,
+      type: Object,
       required: true,
+      default: {},
     },
     date: {
       type: Date,
