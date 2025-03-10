@@ -18,9 +18,9 @@ const App = () => {
     <div className="min-h-screen bg-[#F8F2DE]">
       <ToastContainer />
       <Navbar />
-      <div className="flex min-h-screen pt-16">
+      <div className="flex min-h-screen pt-8">
         <SidePanel />
-        <main className="flex-1 p-6 ml-64">
+        <main className="flex-1 p-6 pt-20 ">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/admin-dashboard" element={<Dashboard />} />
