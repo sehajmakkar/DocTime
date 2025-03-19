@@ -87,10 +87,11 @@ const AddDoctor = () => {
         setAddress1("");
         setAddress2("");
       } else {
+        // console.log(data);
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data || "Failed to add doctor");
       // console.log(error);
     }
   };
