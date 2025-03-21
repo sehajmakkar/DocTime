@@ -105,11 +105,13 @@ const Navbar = () => {
           <Link to="/contact" className="text-[#A31D1D] hover:bg-[#ECDCBF] hover:text-[#D84040] block px-3 py-2 rounded-md text-base font-medium">
             Contact
           </Link>
+          <Link to="/login">
           <div className="pt-2">
             <button className="w-full bg-[#D84040] hover:bg-[#A31D1D] text-white py-2 px-4 rounded font-medium transition-colors">
               Create Account
             </button>
           </div>
+          </Link>
         </div>
       </div>
     </nav>
