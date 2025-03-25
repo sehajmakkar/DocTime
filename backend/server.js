@@ -6,6 +6,8 @@ import connectDB from "./config/db.js";
 import connectCloudinary from "./config/cloudinary.js";
 
 import adminRoutes from "./routes/admin.routes.js";
+import doctorRoutes from "./routes/doctor.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 
 // setup
@@ -20,6 +22,8 @@ app.use(express.json());
 
 // api endpoints
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/doctor", doctorRoutes);
+app.use("/api/v1/user", userRoutes);
 
 
 

@@ -48,7 +48,7 @@ const TopDoctors = () => {
                 </p>
               </div>
               <p className="font-bold text-gray-800">{item.name}</p>
-              <p className="text-sm text-gray-600">{item.speciality}</p>
+              <p className="text-sm text-gray-600">{item.specialization}</p>
               <button className="w-full mt-3 border border-[#D84040] text-[#D84040] hover:bg-[#D84040] hover:text-white py-1 px-3 rounded-md text-sm transition-colors cursor-pointer duration-300">
                 Book Now
               </button>

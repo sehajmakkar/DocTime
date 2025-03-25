@@ -20,10 +20,10 @@ const userSchema = new mongoose.Schema(
       default: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
     },
     address: {
-      type: String,
+      type: Object,
       default: {
-        line1: "Not specified",
-        line2: "Not specified",
+        line1: '',
+        line2: '',
       },
     },
     gender: {
@@ -41,7 +41,8 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
+  { typeKey: '$type' }
 );
 
 const userModel = mongoose.model("user", userSchema);
