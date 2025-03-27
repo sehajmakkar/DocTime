@@ -1,51 +1,150 @@
-import React, { useState } from 'react';
-import { assets } from '../assets/assets';
+import React, { useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import { AppContext } from '../context/AppContext';
+import { toast } from 'react-toastify';
 
 const MyProfile = () => {
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    image: assets.profile_pic,
-    phone: "123-456-7890",
-    address: {
-      line1: "123 Main Street",
-      line2: "Apt 4B",
-    },
-    gender: "Male",
-    dob: "1990-01-01",
-  });
-
+  const { userData, setUserData } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
+  // Fetch user profile on component mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        console.log(token);
+        const response = await axios.get(import.meta.env.VITE_BACKEND_URL + `/api/v1/user/get-profile`, 
+          {
+            headers: { token }
+          }
+        );
+
+        if (response.data.success) {
+          // Ensure address has both line1 and line2, even if they're empty
+          const userWithAddress = {
+            ...response.data.user,
+            address: {
+              line1: response.data.user.address?.line1 || '',
+              line2: response.data.user.address?.line2 || ''
+            }
+          };
+          setUserData(userWithAddress);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        toast.error(error.message);
+      }
+    };
+
+    fetchProfile();
+  }, [setUserData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setUserData({
-        ...userData,
-        [parent]: {
-          ...userData[parent],
-          [child]: value
-        }
-      });
-    } else {
-      setUserData({
-        ...userData,
-        [name]: value
-      });
+    // Handle image file upload
+    if (name === 'image') {
+      const file = files[0];
+      setImageFile(file);
+      // Create a preview URL for the image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserData(prev => ({
+          ...prev,
+          image: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+      return;
     }
+
+    // Handle nested address fields
+    if (name.includes('address.')) {
+      const addressField = name.split('.')[1];
+      setUserData(prev => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [addressField]: value
+        }
+      }));
+      return;
+    }
+
+    // Handle other fields
+    setUserData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleEditToggle = () => {
     setIsEdit(!isEdit);
   };
 
-  const handleSave = () => {
-    // Here you would typically send the updated data to your server
-    console.log("Saving user data:", userData);
-    setIsEdit(false);
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Create form data for file upload
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('phone', userData.phone);
+      formData.append('email', userData.email);
+      
+      // Ensure address is stringified correctly
+      formData.append('address', JSON.stringify({
+        line1: userData.address.line1 || '',
+        line2: userData.address.line2 || ''
+      }));
+      
+      formData.append('dob', userData.dob);
+      formData.append('gender', userData.gender);
+      
+      // Append image if a new file was selected
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/update-profile`, formData, {
+        headers: { 
+          token,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        setIsEdit(false);
+        window.location.reload();
+        toast.success('Profile updated successfully');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserData(prev => ({
+          ...prev,
+          image: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  if (!userData) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#F8F2DE] py-8 px-4">
@@ -65,9 +164,22 @@ const MyProfile = () => {
               />
             </div>
             {isEdit && (
-              <button className="text-sm text-[#A31D1D] hover:underline">
-                Change Photo
-              </button>
+              <>
+                <input 
+                  type="file" 
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="imageUpload"
+                />
+                <label 
+                  htmlFor="imageUpload"
+                  className="text-sm text-[#A31D1D] hover:underline cursor-pointer"
+                >
+                  Change Photo
+                </label>
+              </>
             )}
           </div>
 
@@ -80,7 +192,7 @@ const MyProfile = () => {
                 <input 
                   type="text" 
                   name="name"
-                  value={userData.name} 
+                  value={userData.name || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
@@ -96,7 +208,7 @@ const MyProfile = () => {
                 <input 
                   type="email" 
                   name="email"
-                  value={userData.email} 
+                  value={userData.email || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
@@ -112,7 +224,7 @@ const MyProfile = () => {
                 <input 
                   type="tel" 
                   name="phone"
-                  value={userData.phone} 
+                  value={userData.phone || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
@@ -121,34 +233,35 @@ const MyProfile = () => {
               )}
             </div>
 
-            {/* Address */}
+            {/* Address Line 1 */}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
               {isEdit ? (
                 <input 
                   type="text" 
                   name="address.line1"
-                  value={userData.address.line1} 
+                  value={userData.address?.line1 || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
               ) : (
-                <p className="p-2 bg-gray-50 rounded-md">{userData.address.line1}</p>
+                <p className="p-2 bg-gray-50 rounded-md">{userData.address?.line1}</p>
               )}
             </div>
 
+            {/* Address Line 2 */}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
               {isEdit ? (
                 <input 
                   type="text" 
                   name="address.line2"
-                  value={userData.address.line2} 
+                  value={userData.address?.line2 || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
               ) : (
-                <p className="p-2 bg-gray-50 rounded-md">{userData.address.line2}</p>
+                <p className="p-2 bg-gray-50 rounded-md">{userData.address?.line2}</p>
               )}
             </div>
 
@@ -158,7 +271,7 @@ const MyProfile = () => {
               {isEdit ? (
                 <select 
                   name="gender"
-                  value={userData.gender} 
+                  value={userData.gender || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 >
@@ -180,7 +293,7 @@ const MyProfile = () => {
                 <input 
                   type="date" 
                   name="dob"
-                  value={userData.dob} 
+                  value={userData.dob || ''} 
                   onChange={handleChange}
                   className="border border-[#ECDCBF] rounded-md p-2 bg-[#F8F2DE] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
                 />
@@ -202,9 +315,10 @@ const MyProfile = () => {
                 </button>
                 <button 
                   onClick={handleSave}
-                  className="px-4 py-2 bg-[#D84040] text-white rounded-md hover:bg-[#A31D1D] transition-colors duration-300"
+                  disabled={isLoading}
+                  className={`px-4 py-2 bg-[#D84040] text-white rounded-md hover:bg-[#A31D1D] transition-colors duration-300 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Save
+                  {isLoading ? 'Saving...' : 'Save'}
                 </button>
               </>
             ) : (

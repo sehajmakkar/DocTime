@@ -63,7 +63,7 @@ const Navbar = () => {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
               <div className="py-1">
                 <Link 
-                  to="/profile" 
+                  to="/my-profile" 
                   className="block px-4 py-2 text-sm text-[#A31D1D] hover:bg-[#F8F2DE] hover:text-[#D84040]"
                   onClick={() => setIsDropdownOpen(false)}
                 >
@@ -195,7 +195,7 @@ const Navbar = () => {
           </Link>
           {token ? (
             <>
-              <Link to="/profile" className="text-[#A31D1D] hover:bg-[#ECDCBF] hover:text-[#D84040] block px-3 py-2 rounded-md text-base font-medium">
+              <Link to="/my-profile" className="text-[#A31D1D] hover:bg-[#ECDCBF] hover:text-[#D84040] block px-3 py-2 rounded-md text-base font-medium">
                 My Profile
               </Link>
               <Link to="/appointments" className="text-[#A31D1D] hover:bg-[#ECDCBF] hover:text-[#D84040] block px-3 py-2 rounded-md text-base font-medium">
