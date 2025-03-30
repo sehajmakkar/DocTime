@@ -285,4 +285,52 @@ const listAppointments = async (req, res) => {
   }
 }
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointments };
+// cancel appointment
+const cancelAppointment = async (req, res) => {
+  try {
+    const {userId, appointmentId } = req.body;
+
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    // verify appointment
+    if(appointment.userId !== userId){
+      return res.status(400).json({
+        success: false,
+        message: "You are not authorized to cancel this appointment",
+      });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    // update doctor slots_booked
+    const { docId, slotDate, slotTime } = appointment;
+    const docData = await doctorModel.findById(docId).select("-password");
+    let slots_booked = docData.slots_booked;
+
+    if (slots_booked[slotDate]) {
+      if (slots_booked[slotDate].includes(slotTime)) {
+        slots_booked[slotDate] = slots_booked[slotDate].filter((slot) => slot !== slotTime);
+      }
+    }
+
+    await doctorModel.findByIdAndUpdate(docId, {
+      slots_booked,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment cancelled successfully",
+    });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointments, cancelAppointment };

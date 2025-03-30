@@ -10,23 +10,48 @@ const MyAppointments = () => {
 
   const getUserAppointments = async () => {
     try {
-
-      const {data} = await axios.get(`${backendUrl}/api/v1/user/appointments`, {
-        headers: {
-          token
-        },
-      });
+      const { data } = await axios.get(
+        `${backendUrl}/api/v1/user/appointments`,
+        {
+          headers: {
+            token,
+          },
+        }
+      );
 
       if (data.success) {
         setAppointments(data.appointments);
         console.log(data.appointments);
       }
-
-    } catch(error) {
+    } catch (error) {
       console.error("Error fetching appointments:", error);
       toast.error(error.message);
     }
-  }
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/v1/user/cancel-appointment`,
+        { appointmentId },
+        {
+          headers: {
+            token,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getUserAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      toast.error(error.message);
+    }
+  };
 
   useEffect(() => {
     if (token) {
@@ -48,7 +73,10 @@ const MyAppointments = () => {
             {appointments && appointments.length > 0 ? (
               <div className="space-y-6">
                 {appointments.map((doctor, index) => (
-                  <div key={index} className="bg-white border border-[#ECDCBF] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div
+                    key={index}
+                    className="bg-white border border-[#ECDCBF] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                  >
                     <div className="flex flex-col md:flex-row">
                       {/* Doctor Image */}
                       <div className="w-full md:w-1/4 p-4 flex items-center justify-center">
@@ -70,25 +98,44 @@ const MyAppointments = () => {
                           {doctor.docData.specialization}
                         </p>
                         <div className="mb-3">
-                          <p className="text-gray-600 font-semibold">Address:</p>
-                          <p className="text-gray-600">{doctor.docData.address.line1}</p>
-                          <p className="text-gray-600">{doctor.docData.address.line2}</p>
+                          <p className="text-gray-600 font-semibold">
+                            Address:
+                          </p>
+                          <p className="text-gray-600">
+                            {doctor.docData.address.line1}
+                          </p>
+                          <p className="text-gray-600">
+                            {doctor.docData.address.line2}
+                          </p>
                         </div>
                         <div className="bg-[#F8F2DE] p-2 rounded-md">
                           <p className="text-gray-800">
-                            <span className="font-semibold">Date & Time:</span>{doctor.slotTime} 
+                            <span className="font-semibold">Date & Time:</span>
+                            {doctor.slotTime}
                           </p>
                         </div>
                       </div>
 
                       {/* Action Buttons */}
                       <div className="w-full md:w-1/4 p-4 flex flex-col justify-center space-y-3 border-t md:border-t-0">
-                        <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
-                          Pay Online
-                        </button>
-                        <button className="w-full py-2 border border-[#D84040] text-[#D84040] font-medium rounded-md hover:bg-[#F8F2DE] transition-colors duration-300">
-                          Cancel Appointment
-                        </button>
+                        {!doctor.cancelled && (
+                          <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
+                            Pay Online
+                          </button>
+                        )}
+
+                        {doctor.cancelled ? (
+                          <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
+                            Appointment Cancelled
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleCancelAppointment(doctor._id)}
+                            className="w-full py-2 border border-[#D84040] text-[#D84040] font-medium rounded-md hover:bg-[#F8F2DE] transition-colors duration-300"
+                          >
+                            Cancel Appointment
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -96,7 +143,9 @@ const MyAppointments = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-600 text-lg">You don't have any appointments yet.</p>
+                <p className="text-gray-600 text-lg">
+                  You don't have any appointments yet.
+                </p>
                 <button className="mt-4 px-6 py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
                   Book an Appointment
                 </button>
