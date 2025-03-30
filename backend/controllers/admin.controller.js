@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
+import userModel from "../models/user.model.js";
 
 // add doctor
 const addDoctor = async (req, res) => {
@@ -225,4 +226,33 @@ const appointmentCancel = async (req, res) => {
   }
 };
 
-export { addDoctor, loginAdmin, getAllDoctors, appointmentsAdmin, appointmentCancel };
+// dashboard stats api for admin
+const adminDashboard = async(req, res) => {
+  try {
+
+    const users = await userModel.find({});
+    const doctors = await doctorModel.find({});
+    const appointments = await appointmentModel.find({});
+
+    const dashData = {
+      users: users.length,
+      doctors: doctors.length,
+      appointments: appointments.length,
+      latestAppointments: appointments.reverse().slice(0, 5),
+    }
+
+    return res.status(200).json({
+      success: true,
+      dashData,
+    });
+
+  } catch(error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export { addDoctor, loginAdmin, getAllDoctors, appointmentsAdmin, appointmentCancel, adminDashboard };
