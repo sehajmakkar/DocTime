@@ -2,9 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const MyAppointments = () => {
   const { backendUrl, token } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const [appointments, setAppointments] = useState([]);
 
@@ -49,6 +51,77 @@ const MyAppointments = () => {
       }
     } catch (error) {
       console.error("Error cancelling appointment:", error);
+      toast.error(error.message);
+    }
+  };
+
+
+// APIs FOR RAZORPAY PAYMENT
+// WILL IMPLEMENT AFTER I DO KYC.
+
+  const initiatePayment = async (order) => {
+    try {
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Appointment Payment",
+        description: "Payment for appointment booking",
+        order_id: order.id,
+        receipt: order.receipt,
+        handler: async (response) => {
+          // console.log("Payment response:", response);
+
+          try {
+            const { data } = await axios.post(
+              `${backendUrl}/api/v1/user/verify-payment`,
+              response,
+              {
+                headers: {
+                  token,
+                },
+              }
+            );
+
+            if (data.success) {
+              getUserAppointments();
+              navigate("/ my-appointments");
+              toast.success(data.message);
+            } else {
+              toast.error(data.message);
+            }
+          } catch (error) {
+            console.error("Error verifying payment:", error);
+            toast.error(error.message);
+          }
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      toast.error(error.message);
+    }
+  };
+
+  const handlePayment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/v1/user/payment-razorpay`,
+        { appointmentId },
+        {
+          headers: {
+            token,
+          },
+        }
+      );
+
+      if (data.success) {
+        initiatePayment(data.order);
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
       toast.error(error.message);
     }
   };
@@ -118,8 +191,17 @@ const MyAppointments = () => {
 
                       {/* Action Buttons */}
                       <div className="w-full md:w-1/4 p-4 flex flex-col justify-center space-y-3 border-t md:border-t-0">
-                        {!doctor.cancelled && (
+                        {!doctor.cancelled && doctor.payment && (
                           <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
+                            Appointment Paid
+                          </button>
+                        )}
+
+                        {!doctor.cancelled && !doctor.payment && (
+                          <button
+                            className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300"
+                            // onClick={() => handlePayment(doctor._id)}
+                          >
                             Pay Online
                           </button>
                         )}

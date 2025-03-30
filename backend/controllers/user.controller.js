@@ -6,6 +6,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
+import razorpay from "razorpay";
 
 // register
 const registerUser = async (req, res) => {
@@ -333,4 +334,92 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointments, cancelAppointment };
+// APIs FOR RAZORPAY PAYMENT
+// WILL IMPLEMENT AFTER I DO KYC.
+
+// appointment payment using razorpay
+// const razorpayInstance = new razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID,
+//   key_secret: process.env.RAZORPAY_SECRET,
+// });
+const paymentRazorpay = async (req, res) => {
+
+  try {
+
+    const {appointmentId} = req.body;
+
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    if(!appointment || appointment.cancelled){
+      return res.status(400).json({
+        success: false,
+        message: "Appointment not found or already cancelled",
+      });
+    }
+
+    // creating options for razorpay payment
+    const options = {
+      amount: appointment.amount * 100,
+      currency: process.env.CURRENCY,
+      receipt: appointmentId,
+    };
+
+    // creating order
+    const order = await razorpayInstance.orders.create(options);
+
+    if(!order){
+      return res.status(400).json({
+        success: false,
+        message: "Unable to create order",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+
+  } catch(error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+}
+
+// verify payment razorpay
+const verifyRazorpay = async (req, res) => {
+  try {
+
+    const {razorpay_order_id} = req.body;
+    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+
+    if(orderInfo.status === "paid"){
+      await appointmentModel.findByIdAndUpdate(orderInfo.receipt, {
+        payment: true,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Payment successful",
+      });
+
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Payment failed",
+      });
+    }
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointments, cancelAppointment, paymentRazorpay, verifyRazorpay };
