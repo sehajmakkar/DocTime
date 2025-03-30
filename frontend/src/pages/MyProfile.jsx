@@ -2,12 +2,14 @@ import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const MyProfile = () => {
-  const { userData, setUserData } = useContext(AppContext);
+  const { userData, setUserData, token } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch user profile on component mount
   useEffect(() => {
@@ -40,6 +42,8 @@ const MyProfile = () => {
 
     fetchProfile();
   }, [setUserData]);
+
+  
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
