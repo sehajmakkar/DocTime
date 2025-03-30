@@ -1,8 +1,40 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const MyAppointments = () => {
-  const { doctors } = useContext(AppContext);
+  const { backendUrl, token } = useContext(AppContext);
+
+  const [appointments, setAppointments] = useState([]);
+
+  const getUserAppointments = async () => {
+    try {
+
+      const {data} = await axios.get(`${backendUrl}/api/v1/user/appointments`, {
+        headers: {
+          token
+        },
+      });
+
+      if (data.success) {
+        setAppointments(data.appointments);
+        console.log(data.appointments);
+      }
+
+    } catch(error) {
+      console.error("Error fetching appointments:", error);
+      toast.error(error.message);
+    }
+  }
+
+  useEffect(() => {
+    if (token) {
+      getUserAppointments();
+    } else {
+      toast.error("Please login to view your appointments.");
+    }
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-[#F8F2DE] py-8 px-4">
@@ -13,17 +45,17 @@ const MyAppointments = () => {
           </div>
 
           <div className="p-6">
-            {doctors && doctors.length > 0 ? (
+            {appointments && appointments.length > 0 ? (
               <div className="space-y-6">
-                {doctors.slice(0, 3).map((doctor, index) => (
+                {appointments.map((doctor, index) => (
                   <div key={index} className="bg-white border border-[#ECDCBF] rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                     <div className="flex flex-col md:flex-row">
                       {/* Doctor Image */}
                       <div className="w-full md:w-1/4 p-4 flex items-center justify-center">
                         <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#ECDCBF]">
                           <img
-                            src={doctor.image}
-                            alt={doctor.name}
+                            src={doctor.docData.image}
+                            alt={doctor.docData.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -32,19 +64,19 @@ const MyAppointments = () => {
                       {/* Appointment Details */}
                       <div className="w-full md:w-1/2 p-4 border-t md:border-t-0 md:border-l md:border-r border-[#ECDCBF]">
                         <h2 className="text-xl font-bold text-[#A31D1D] mb-2">
-                          Dr. {doctor.name}
+                          Dr. {doctor.docData.name}
                         </h2>
                         <p className="text-gray-700 font-medium mb-3">
-                          {doctor.speciality}
+                          {doctor.docData.specialization}
                         </p>
                         <div className="mb-3">
                           <p className="text-gray-600 font-semibold">Address:</p>
-                          <p className="text-gray-600">{doctor.address.line1}</p>
-                          <p className="text-gray-600">{doctor.address.line2}</p>
+                          <p className="text-gray-600">{doctor.docData.address.line1}</p>
+                          <p className="text-gray-600">{doctor.docData.address.line2}</p>
                         </div>
                         <div className="bg-[#F8F2DE] p-2 rounded-md">
                           <p className="text-gray-800">
-                            <span className="font-semibold">Date & Time:</span> 25/10/2023 | 10:00AM
+                            <span className="font-semibold">Date & Time:</span>{doctor.slotTime} 
                           </p>
                         </div>
                       </div>

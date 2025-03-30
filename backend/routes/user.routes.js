@@ -1,5 +1,5 @@
 import express from "express";
-import { bookAppointment, getProfile, loginUser, registerUser, updateProfile } from "../controllers/user.controller.js";
+import { bookAppointment, getProfile, loginUser, registerUser, updateProfile, listAppointments } from "../controllers/user.controller.js";
 import { authUser } from "../middlewares/user.middleware.js";
 import upload from "../middlewares/multer.js";
 
@@ -10,5 +10,6 @@ router.post("/login", loginUser);
 router.get("/get-profile", authUser, getProfile);
 router.post("/update-profile", upload.single("image"), authUser, updateProfile);
 router.post("/book-appointment", authUser, bookAppointment);
+router.get("/appointments", authUser, listAppointments);
 
 export default router;
