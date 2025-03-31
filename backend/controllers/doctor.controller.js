@@ -20,14 +20,12 @@ const changeAvailability = async (req, res) => {
     doctor.available = !doctor.available;
     await doctor.save();
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: `Doctor is now ${
-          doctor.available ? "available" : "unavailable"
-        }`,
-      });
+    return res.status(200).json({
+      success: true,
+      message: `Doctor is now ${
+        doctor.available ? "available" : "unavailable"
+      }`,
+    });
   } catch (error) {
     console.error(error);
     return res
@@ -82,126 +80,156 @@ const doctorLogin = async (req, res) => {
 // get doctor appointments
 const getDoctorAppointments = async (req, res) => {
   try {
-
     const { docId } = req.body;
-    
+
     const appointments = await appointmentModel.find({ docId });
 
-    res.json({ 
-      success: true, 
-      appointments
+    res.json({
+      success: true,
+      appointments,
     });
-
   } catch (error) {
-
     console.error(error);
     return res.status(500).json({ success: false, message: error.message });
-
   }
 };
 
 // mark appointment completed
 const appointmentComplete = async (req, res) => {
-
   try {
     const { docId, appointmentId } = req.body;
     const appointment = await appointmentModel.findById(appointmentId);
-    if(appointment && appointment.docId === docId){
-      await  appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true });
+    if (appointment && appointment.docId === docId) {
+      await appointmentModel.findByIdAndUpdate(appointmentId, {
+        isCompleted: true,
+      });
 
       return res.status(200).json({
         success: true,
         message: "Appointment marked as completed",
       });
-
     }
 
     return res.status(404).json({
       success: false,
       message: "Appointment not found",
     });
-  
   } catch (error) {
     console.error(error);
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
   }
-
-}
+};
 
 // mark appointment cancelled
 const appointmentCancel = async (req, res) => {
-
   try {
     const { docId, appointmentId } = req.body;
     const appointment = await appointmentModel.findById(appointmentId);
 
-    if(appointment && appointment.docId === docId){
-      await  appointmentModel.findByIdAndUpdate(appointmentId, { cancelled : true });
+    if (appointment && appointment.docId === docId) {
+      await appointmentModel.findByIdAndUpdate(appointmentId, {
+        cancelled: true,
+      });
 
       return res.status(200).json({
         success: true,
         message: "Appointment marked as cancelled",
       });
-
     }
 
     return res.status(404).json({
       success: false,
       message: "Cancellation failed",
     });
-  
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
-
-}
+};
 
 // doctor dashboard
 const doctorDashboard = async (req, res) => {
-
   try {
-
     const { docId } = req.body;
 
     const appointments = await appointmentModel.find({ docId });
 
     let earnings = 0;
     appointments.map((item) => {
-      if(item.isCompleted || item.payment){
+      if (item.isCompleted || item.payment) {
         earnings += item.amount;
       }
     });
 
-    let patients  = [];
+    let patients = [];
     appointments.map((item) => {
-      if(!patients.includes(item.userId)){
+      if (!patients.includes(item.userId)) {
         patients.push(item.userId);
       }
-    })
+    });
 
-    const dashData =  {
+    const dashData = {
       earnings,
       patients: patients.length,
       appointments: appointments.length,
       latestAppointments: appointments.reverse().slice(0, 5),
-    }
+    };
 
     return res.status(200).json({
       success: true,
       message: "Doctor dashboard data fetched successfully",
       dashData,
     });
-
-  } catch(error) {
+  } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: error.message });
   }
+};
 
-}
+// doctor profile
+const doctorProfile = async (req, res) => {
+  try {
+    const { docId } = req.body;
+    const doctor = await doctorModel.findById(docId).select("-password");
 
-export { changeAvailability, doctorList, doctorLogin, getDoctorAppointments, appointmentComplete, appointmentCancel, doctorDashboard };
+    return res.status(200).json({
+      success: true,
+      message: "Doctor profile fetched successfully",
+      doctor,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// update doctor profile
+const updateDoctorProfile = async (req, res) => {
+  try {
+    const { docId, fees, address, available } = req.body;
+
+    await doctorModel.findByIdAndUpdate(docId, { fees, address, available });
+
+    res.json({
+      success: true,
+      message: "Doctor profile updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export {
+  changeAvailability,
+  doctorList,
+  doctorLogin,
+  getDoctorAppointments,
+  appointmentComplete,
+  appointmentCancel,
+  doctorDashboard,
+  doctorProfile,
+  updateDoctorProfile,
+};

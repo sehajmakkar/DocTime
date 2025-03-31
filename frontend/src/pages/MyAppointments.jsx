@@ -191,13 +191,13 @@ const MyAppointments = () => {
 
                       {/* Action Buttons */}
                       <div className="w-full md:w-1/4 p-4 flex flex-col justify-center space-y-3 border-t md:border-t-0">
-                        {!doctor.cancelled && doctor.payment && (
+                        {!doctor.cancelled && doctor.payment && !doctor.isCompleted && (
                           <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
                             Appointment Paid
                           </button>
                         )}
 
-                        {!doctor.cancelled && !doctor.payment && (
+                        {!doctor.cancelled && !doctor.payment && !doctor.isCompleted && (
                           <button
                             className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300"
                             // onClick={() => handlePayment(doctor._id)}
@@ -206,18 +206,30 @@ const MyAppointments = () => {
                           </button>
                         )}
 
-                        {doctor.cancelled ? (
+                        
+
+                        {doctor.cancelled && !doctor.isCompleted ? (
                           <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
                             Appointment Cancelled
                           </button>
                         ) : (
-                          <button
+                          !doctor.isCompleted && <button
                             onClick={() => handleCancelAppointment(doctor._id)}
                             className="w-full py-2 border border-[#D84040] text-[#D84040] font-medium rounded-md hover:bg-[#F8F2DE] transition-colors duration-300"
                           >
                             Cancel Appointment
                           </button>
                         )}
+
+{
+                          doctor.isCompleted && (
+                            <button className="w-full py-2 bg-[#D84040] text-white font-medium rounded-md hover:bg-[#A31D1D] transition-colors duration-300">
+                            Completed!
+                          </button>
+                          )
+                        }
+
+                        
                       </div>
                     </div>
                   </div>
