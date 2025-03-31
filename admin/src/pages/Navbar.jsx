@@ -32,7 +32,7 @@ const Navbar = () => {
             </svg>
           </div>
           <div>
-            <h1 className="font-bold text-xl" style={{ color: '#A31D1D' }}>DocApp</h1>
+            <h1 className="font-bold text-xl" style={{ color: '#A31D1D' }}>DocTime</h1>
             <p className="text-sm opacity-75" style={{ color: '#A31D1D' }}>
               {aToken ? 'Admin Dashboard' : 'Doctor Dashboard'}
             </p>

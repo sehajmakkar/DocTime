@@ -64,13 +64,13 @@ const AppContextProvider = (props) => {
     getDoctorsData();
   }, []);
 
-  useEffect(() => {
-    if(token){
-      loadUserProfileData();
-    } else {
-      setUserData({});
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if(token){
+  //     loadUserProfileData();
+  //   } else {
+  //     setUserData({});
+  //   }
+  // }, [token]);
 
   const value = {
     doctors, 
