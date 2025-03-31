@@ -44,7 +44,7 @@ const TopDoctors = () => {
               <div className="flex justify-between items-center mb-2">
                 <p className="text-sm text-gray-500">⭐ 4.8 (120)</p>
                 <p className="text-[#D84040] text-sm font-medium bg-[#ECDCBF] py-1 px-2 rounded-full">
-                  Available
+                  {item.available ? "Available" : "Unavailable"}
                 </p>
               </div>
               <p className="font-bold text-gray-800">{item.name}</p>

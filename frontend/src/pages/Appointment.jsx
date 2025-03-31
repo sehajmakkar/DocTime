@@ -253,7 +253,7 @@ const Appointment = () => {
         <h2 className="text-xl font-bold text-[#A31D1D] mb-4">
           Similar {docInfo.specialization} Doctors
         </h2>
-        <RelatedDoctors docId={docId} speciality={docInfo.specialization} />
+        <RelatedDoctors docId={docId} specialization={docInfo.specialization} />
       </div>
     </div>
   );

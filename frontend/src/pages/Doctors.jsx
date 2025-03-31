@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 const Doctors = () => {
   const navigate = useNavigate();
-  const { speciality } = useParams();
+  const { specialization } = useParams();
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [activeFilter, setActiveFilter] = useState(speciality || 'All');
+  const [activeFilter, setActiveFilter] = useState(specialization || 'All');
   const [searchQuery, setSearchQuery] = useState('');
   const { doctors } = useContext(AppContext);
 
@@ -22,20 +22,20 @@ const Doctors = () => {
     'Gastroenterologist'
   ];
 
-  // Filter doctors based on specialty and search query
+  // Filter doctors based on specialization and search query
   useEffect(() => {
     let result = doctors;
     
     if (activeFilter !== 'All') {
       result = doctors.filter(doctor => 
-        doctor.speciality.toLowerCase() === activeFilter.toLowerCase()
+        doctor.specialization.toLowerCase() === activeFilter.toLowerCase()
       );
     }
     
     if (searchQuery) {
       result = result.filter(doctor => 
         doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doctor.speciality.toLowerCase().includes(searchQuery.toLowerCase())
+        doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
@@ -50,7 +50,7 @@ const Doctors = () => {
       <div className="w-full mb-6">
         <input
           type="text"
-          placeholder="Search by name or specialty..."
+          placeholder="Search by name or specialization..."
           className="w-full p-3 rounded-md border border-[#ECDCBF] focus:outline-none focus:ring-2 focus:ring-[#D84040]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -60,19 +60,19 @@ const Doctors = () => {
       <div className="flex flex-col md:flex-row gap-6">
         {/* Filter panel */}
         <div className="w-full md:w-1/4 bg-white rounded-lg shadow-md p-4 h-fit">
-          <p className="text-xl font-semibold text-[#A31D1D] mb-4">Browse Specialties</p>
+          <p className="text-xl font-semibold text-[#A31D1D] mb-4">Browse Specializations</p>
           <div className="space-y-2">
-            {specialties.map((specialty, index) => (
+            {specialties.map((specialization, index) => (
               <div 
                 key={index} 
                 className={`p-2 rounded-md cursor-pointer transition-colors ${
-                  activeFilter === specialty 
+                  activeFilter === specialization 
                     ? 'bg-[#D84040] text-white' 
                     : 'hover:bg-[#ECDCBF]'
                 }`}
-                onClick={() => setActiveFilter(specialty)}
+                onClick={() => setActiveFilter(specialization)}
               >
-                <p className="font-medium">{specialty}</p>
+                <p className="font-medium">{specialization}</p>
               </div>
             ))}
           </div>
@@ -95,7 +95,7 @@ const Doctors = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h3 className="font-bold text-lg">{doctor.name}</h3>
-                        <p className="text-gray-600">{doctor.speciality}</p>
+                        <p className="text-gray-600">{doctor.specialization}</p>
                       </div>
                       <span className="bg-[#ECDCBF] text-[#D84040] text-sm py-1 px-2 rounded-full">
                         Available

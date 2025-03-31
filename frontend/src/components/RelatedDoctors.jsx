@@ -2,19 +2,20 @@ import React, { useState, useContext, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
-const RelatedDoctors = ({ docId, speciality }) => {
+const RelatedDoctors = ({ docId, specialization }) => {
   const navigate = useNavigate();
   const { doctors } = useContext(AppContext);
   const [relDoc, setRelDoc] = useState([]);
 
   useEffect(() => {
-    if (doctors && speciality) {
+    console.log(doctors);
+    if (doctors && specialization) {
       const filteredDoctors = doctors.filter(
-        (doc) => doc.speciality === speciality && doc._id !== docId
+        (doc) => doc.specialization === specialization && doc._id !== docId
       );
       setRelDoc(filteredDoctors);
     }
-  }, [doctors, speciality, docId]);
+  }, [doctors, specialization, docId]);
 
   if (relDoc.length === 0) {
     return <p className="text-gray-500 italic">No related doctors found</p>;
@@ -39,7 +40,7 @@ const RelatedDoctors = ({ docId, speciality }) => {
             />
             <div className="absolute top-2 right-2">
               <span className="bg-[#ECDCBF] text-[#D84040] text-xs px-2 py-1 rounded-full">
-                Available
+                {doc.available ? "Available" : "Unavailable"}
               </span>
             </div>
           </div>
@@ -47,7 +48,7 @@ const RelatedDoctors = ({ docId, speciality }) => {
             <h2 className="text-lg font-semibold group-hover:text-[#D84040] transition-colors duration-200">
               {doc.name}
             </h2>
-            <p className="text-gray-600 text-sm">{doc.speciality}</p>
+            <p className="text-gray-600 text-sm">{doc.specialization}</p>
             <div className="flex justify-between items-center mt-2">
               <span className="text-sm text-gray-500">⭐ 4.8</span>
               <span className="text-[#D84040] text-sm font-medium">

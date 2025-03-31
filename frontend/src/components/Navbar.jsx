@@ -70,7 +70,7 @@ const Navbar = () => {
                   My Profile
                 </Link>
                 <Link 
-                  to="/appointments" 
+                  to="/my-appointments" 
                   className="block px-4 py-2 text-sm text-[#A31D1D] hover:bg-[#F8F2DE] hover:text-[#D84040]"
                   onClick={() => setIsDropdownOpen(false)}
                 >
@@ -103,15 +103,18 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and Name */}
+          
           <div className="flex items-center">
+          <Link to={"/"}>
             <div className="flex-shrink-0 flex items-center">
               <div className="bg-[#D84040] text-[#F8F2DE] h-10 w-10 rounded-full flex items-center justify-center font-bold">
-                MD
+                DT
               </div>
               <h1 className="ml-3 text-xl font-bold text-[#A31D1D]">
-                MediConnect
+                DocTime
               </h1>
             </div>
+          </Link>
           </div>
           
           {/* Desktop Navigation */}

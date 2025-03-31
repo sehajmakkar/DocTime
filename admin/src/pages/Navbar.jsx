@@ -1,9 +1,22 @@
 import React, { useContext } from 'react';
 import { AdminContext } from '../context/AdminContext';
 import { LogOut } from 'lucide-react';
+import { DoctorContext } from '../context/DoctorContext';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const { aToken } = useContext(AdminContext);
+  const { aToken, setAToken } = useContext(AdminContext);
+  const { dToken, setDToken } = useContext(DoctorContext);
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    navigate("/");
+    aToken && setAToken("");
+    aToken && localStorage.removeItem("aToken");
+    dToken && setDToken("");
+    dToken && localStorage.removeItem("dToken");
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-40 px-4 py-3">
@@ -34,10 +47,7 @@ const Navbar = () => {
               backgroundColor: '#D84040', 
               color: '#F8F2DE'
             }}
-            onClick={() => {
-              localStorage.removeItem('aToken');
-              window.location.href = '/login';
-            }}
+            onClick={logout}
           >
             <LogOut size={18} />
             <span>Logout</span>
