@@ -63,7 +63,7 @@ const DoctorsList = () => {
     }
   };
 
-  return (
+  return aToken && (
     <div className="p-6 bg-[#F8F2DE] min-h-screen transition-all duration-300">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-[#A31D1D] opacity-90">Doctors List</h1>

@@ -29,10 +29,14 @@ const Navbar = () => {
         {/* Right Side Elements */}
         <div className="flex items-center space-x-4">
           <button 
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all hover:shadow-md"
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all hover:shadow-md cursor-pointer"
             style={{ 
               backgroundColor: '#D84040', 
               color: '#F8F2DE'
+            }}
+            onClick={() => {
+              localStorage.removeItem('aToken');
+              window.location.href = '/login';
             }}
           >
             <LogOut size={18} />
