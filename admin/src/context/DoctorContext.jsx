@@ -11,6 +11,7 @@ const DoctorContextProvider = (props) => {
     localStorage.getItem('dToken') ? localStorage.getItem('dToken') : ""
   );
   const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Use effect to set the token in localStorage when it changes
@@ -96,6 +97,29 @@ const DoctorContextProvider = (props) => {
 
   }
 
+  const getDashData = async () => {
+    try {
+
+      const { data } = await axios.get(`${backendUrl}/api/v1/doctor/dashboard`, {
+        headers: {
+          dToken
+        }
+      });
+
+      if (data.success) {
+        setDashData(data.dashData);
+        console.log(data.dashData);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+
+    } catch (error){
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
+
   const value = {
     dToken,
     setDToken,
@@ -106,7 +130,10 @@ const DoctorContextProvider = (props) => {
     loading,
     setLoading,
     completeAppointment,
-    cancelAppointment
+    cancelAppointment,
+    getDashData,
+    dashData,
+    setDashData,
   };
 
   return (

@@ -161,4 +161,47 @@ const appointmentCancel = async (req, res) => {
 
 }
 
-export { changeAvailability, doctorList, doctorLogin, getDoctorAppointments, appointmentComplete, appointmentCancel };
+// doctor dashboard
+const doctorDashboard = async (req, res) => {
+
+  try {
+
+    const { docId } = req.body;
+
+    const appointments = await appointmentModel.find({ docId });
+
+    let earnings = 0;
+    appointments.map((item) => {
+      if(item.isCompleted || item.payment){
+        earnings += item.amount;
+      }
+    });
+
+    let patients  = [];
+    appointments.map((item) => {
+      if(!patients.includes(item.userId)){
+        patients.push(item.userId);
+      }
+    })
+
+    const dashData =  {
+      earnings,
+      patients: patients.length,
+      appointments: appointments.length,
+      latestAppointments: appointments.reverse().slice(0, 5),
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Doctor dashboard data fetched successfully",
+      dashData,
+    });
+
+  } catch(error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+
+}
+
+export { changeAvailability, doctorList, doctorLogin, getDoctorAppointments, appointmentComplete, appointmentCancel, doctorDashboard };
