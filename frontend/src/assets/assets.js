@@ -35,7 +35,7 @@ import Gastroenterologist from "./Gastroenterologist.svg";
 import General_physician from "./General_physician.svg";
 import Gynecologist from "./Gynecologist.svg";
 import Neurologist from "./Neurologist.svg";
-import pediatrician from "./pediatricians.svg";
+// import pediatrician from "./pediatricians.svg";
 
 export const assets = {
   appointment_img,
