@@ -159,6 +159,30 @@ const Navbar = () => {
               >
                 Contact
               </Link>
+              
+              {/* Admin Panel Link - This will stand out */}
+              <a
+                href="https://admin-doc-time.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-white bg-gradient-to-r from-[#D84040] to-[#FF9B48] hover:from-[#A31D1D] hover:to-[#F38220] px-3 py-2 rounded-md text-base font-medium transition-all duration-300 transform hover:scale-105 shadow-md"
+              >
+                <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5 mr-2 text-[#F8F2DE] group-hover:animate-pulse" 
+              fill="none"
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" 
+              />
+            </svg>
+                Admin Panel
+              </a>
             </div>
             {renderAuthButton()}
           </div>
@@ -235,6 +259,31 @@ const Navbar = () => {
           >
             Contact
           </Link>
+          
+          {/* Admin Panel Link for mobile - Eye-catching */}
+          <a
+            href="https://admin-doc-time.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center text-white bg-gradient-to-r from-[#D84040] to-[#FF9B48] hover:from-[#A31D1D] hover:to-[#F38220] px-3 py-3 rounded-md text-base font-medium transition-all duration-300 shadow-md"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5 mr-2 text-[#F8F2DE] group-hover:animate-pulse" 
+              fill="none"
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" 
+              />
+            </svg>
+            Admin Panel
+          </a>
+          
           {token ? (
             <>
               <Link
