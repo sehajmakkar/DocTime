@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { AdminContext } from "../context/AdminContext";
 import axios from "axios";
@@ -8,10 +8,22 @@ import { DoctorContext } from "../context/DoctorContext";
 const Login = () => {
   const [state, setState] = useState("Admin");
   const { setAToken, backendUrl } = useContext(AdminContext);
-  const {setDToken} = useContext(DoctorContext);
+  const { setDToken } = useContext(DoctorContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Pre-fill admin credentials when Admin tab is selected
+  useEffect(() => {
+    if (state === "Admin") {
+      setEmail("admin@doc.com");
+      setPassword("Admin123!");
+    } else {
+      // Clear fields when Doctor tab is selected
+      setEmail("");
+      setPassword("");
+    }
+  }, [state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,8 +67,12 @@ const Login = () => {
       } else {
         toast.error("Login failed. Please try again.");
       }
-
     }
+  };
+
+  // Function to handle state change and set credentials
+  const handleStateChange = (newState) => {
+    setState(newState);
   };
 
   return (
@@ -71,7 +87,7 @@ const Login = () => {
                 ? "bg-[#A31D1D] text-white"
                 : "bg-[#ECDCBF] text-[#A31D1D]"
             }`}
-            onClick={() => setState("Admin")}
+            onClick={() => handleStateChange("Admin")}
           >
             Admin
           </button>
@@ -82,7 +98,7 @@ const Login = () => {
                 ? "bg-[#A31D1D] text-white"
                 : "bg-[#ECDCBF] text-[#A31D1D]"
             }`}
-            onClick={() => setState("Doctor")}
+            onClick={() => handleStateChange("Doctor")}
           >
             Doctor
           </button>
@@ -127,6 +143,14 @@ const Login = () => {
           >
             Login
           </button>
+
+          {state === "Admin" && (
+            <div className="mt-4 text-center text-sm text-gray-600">
+              <p>
+                <span className="text-[#D84040] font-medium">Note:</span> Admin credentials are pre-filled for your convenience
+              </p>
+            </div>
+          )}
 
           {/* <div className="mt-4 text-center text-sm text-gray-600">
             <p className="text-sm mt-6 text-gray-600">
